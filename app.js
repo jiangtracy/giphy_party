@@ -1,6 +1,9 @@
 'use strict';
 
 console.log("Let's get this party started!");
+//add a base url constant 
+const API_KEY = "MhAodEJIJxQMxW9XqxKjyXfNYdLoOIym";
+const URL = "http://api.giphy.com/v1/gifs";
 
 /* When search button is clicked, create a new image on the page and append to the gifs div. */
 function displayGIF(gif) {
@@ -13,33 +16,32 @@ function displayGIF(gif) {
 
 /* Random number generator */
 
-function randomNumberGenerator(response){
-  return Math.floor(Math.random() * response.data.data.length);
+function randomNumberGenerator(number){
+  return Math.floor(Math.random() * number);
 }
 
 /* When search button is clicked, get the value from the search input and make a get request to giphy.com. Call displayGIF. */
 async function getGiphy(evt) {
 	evt.preventDefault();
 
-	let searchInput = $('#search-input').val();
-	let response = await axios.get(
-		`http://api.giphy.com/v1/gifs/search?q=${searchInput}&api_key=MhAodEJIJxQMxW9XqxKjyXfNYdLoOIym`
-	);
-	let randomPick = randomNumberGenerator(response);
+  
+	const searchInput = $('#search-input').val();
+	const response = await axios.get(
+		`${URL}/search?q=${searchInput}&api_key=${API_KEY}`
+  );
+  let gifArray = response.data.data;
+	let randomPick = randomNumberGenerator(gifArray.length); // pass in only the data needed
 
 	// console.log('response from website:', response);
 
-	displayGIF(response.data.data[randomPick]);
+	displayGIF(gifArray[randomPick]);
 
 	$('form').trigger('reset');
 }
 
-$('#search-btn').on('click', getGiphy);
+$('form').on('submit', getGiphy); 
 
 /* When remove button is clicked, remove all gifs. */
 
-function emptyGif() {
-	$('#gifs').empty();
-}
 
-$('#remove-btn').on('click', emptyGif);
+$('#remove-btn').on('click', () => $('#gifs').empty());
